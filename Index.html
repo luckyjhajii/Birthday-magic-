@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Magic - Find Your Birth Meaning</title>
+    <!-- कॉन्फेटी इफ़ेक्ट के लिए एक्सटर्नल लाइब्रेरी -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #ffecd2;
+            text-shadow: 0 0 10px rgba(255, 236, 210, 0.5);
+        }
+
+        p {
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            color: #e0e0e0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #ffb199;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+            transition: 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 65, 108, 0.6);
+        }
+
+        #result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #result-title {
+            font-size: 1.2rem;
+            color: #ffeb3b;
+            margin-bottom: 8px;
+        }
+
+        #result-desc {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>✨ Birthday Magic Vibe ✨</h1>
+        <p>अपनी जन्म तिथि (Date of Birth) दर्ज करें और जानें अपने जन्म का जादुई और खास मतलब!</p>
+
+        <div class="input-group">
+            <label for="dob">अपनी जन्म तारीख चुनें:</label>
+            <input type="date" id="dob">
+        </div>
+
+        <button class="btn" onclick="revealMagic()">मैजिक देखें 🪄</button>
+
+        <div id="result-box">
+            <h3 id="result-title"></h3>
+            <p id="result-desc"></p>
+        </div>
+    </div>
+
+    <script>
+        // कुछ खूबसूरत और पॉज़िटिव अर्थों की लिस्ट
+        const magicMeanings = [
+            {
+                title: "🌟 जन्मजात लीडर और विजनरी",
+                desc: "आपकी पर्सनैलिटी में एक अलग ही सम्मोहन है। आप जीवन में हर परिस्थिति को संभालना जानते हैं और आपके विचार दूसरों को एक नई राह दिखाते हैं।"
+            },
+            {
+                title: "💖 बेहद दयालु और प्यार करने वाले",
+                desc: "आपका दिल सोने जैसा साफ है। आप अपनों की खुशियों के लिए हमेशा खड़े रहते हैं और आपकी मौजूदगी ही दूसरों के चेहरों पर मुस्कान ले आती है।"
+            },
+            {
+                title: "🚀 निडर और सपने देखने वाले मुसाफिर",
+                desc: "आपकी सोच आसमान छूने की है। रुकावटें आपको रोक नहीं पातीं, बल्कि आप हर चुनौती को सीढ़ी बनाकर अपनी सफलता की इबारत लिखते हैं।"
+            },
+            {
+                title: "🎨 एक सच्ची कलात्मक आत्मा (Creative Soul)",
+                desc: "आपकी रचनात्मकता (Creativity) और सोचने का अंदाज बिल्कुल अलग है। आप छोटी-छोटी चीजों में भी खूबसूरती ढूंढ लेते हैं और दुनिया को रंगीन बनाते हैं।"
+            },
+            {
+                title: "🍀 भाग्यशाली और सकारात्मक ऊर्जा के स्रोत",
+                desc: "आप जहाँ भी जाते हैं, वहाँ पॉजिटिविटी फैल जाती है। कठिन समय में भी उम्मीद का दामन न छोड़ना आपकी सबसे बड़ी ताकत है।"
+            },
+            {
+                title: "🧠 बुद्धिमान और गहरे विचारक",
+                desc: "आपकी सूझबूझ और समझदारी लोगों को प्रभावित करती है। आप किसी भी फैसले को बहुत गहराई से सोचते हैं और हमेशा सही रास्ता चुनते हैं।"
+            }
+        ];
+
+        function revealMagic() {
+            const dobInput = document.getElementById('dob').value;
+            const resultBox = document.getElementById('result-box');
+            const resultTitle = document.getElementById('result-title');
+            const resultDesc = document.getElementById('result-desc');
+
+            if (!dobInput) {
+                alert("कृपया पहले अपनी जन्म तिथि चुनें!");
+                return;
+            }
+
+            // तारीख के अंकों का जोड़ निकालकर एक यूनिक इंडेक्स चुनना ताकि हर जन्मतिथि पर अलग/शानदार मतलब आए
+            let sum = 0;
+            for (let i = 0; i < dobInput.length; i++) {
+                if (!isNaN(dobInput[i])) {
+                    sum += parseInt(dobInput[i]);
+                }
+            }
+
+            const selectedMeaning = magicMeanings[sum % magicMeanings.length];
+
+            // परिणाम दिखाना
+            resultTitle.innerHTML = selectedMeaning.title;
+            resultDesc.innerHTML = selectedMeaning.desc;
+            resultBox.style.display = "block";
+
+            // जादुई कन्फेटी (Fireworks) इफ़ेक्ट
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+
+</body>
+</html>
